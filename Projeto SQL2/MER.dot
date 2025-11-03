@@ -1,0 +1,153 @@
+digraph MER_Fazenda {
+
+    // --- Configurações Gerais (Mais justas) ---
+    graph [
+        label="MER - Fazenda São José", 
+        labelloc=t, 
+        fontsize=24, 
+        rankdir=LR,
+        nodesep=0.6,
+        ranksep=1.2,
+        overlap=false 
+    ];
+    
+    // --- Estilos Padrão ---
+    node [ fontname="Arial" ];
+    edge [ fontname="Arial", fontsize=10, dir=none ]; 
+
+    // --- 1. DEFINIÇÃO DOS NÓS ---
+
+    // Entidades principais
+    node [shape=box, style="filled", fillcolor="#E0E0E0", peripheries=1, fontsize=12];
+    BOI; PASTO; FUNCIONARIO; PRODUTO; COMPRADOR; VENDEDOR; LOTE;
+    
+    // Entidades associativas
+    node [shape=box, peripheries=2, fontsize=12];
+    PESAGEM; APLICACAO;
+    
+    // Relacionamentos
+    node [shape=diamond, style="filled", fillcolor="#B0C4DE", peripheries=1, fontsize=10];
+    rel_esta_em [label="Esta_Em"];
+    rel_pertence_ao [label="Pertence_Ao"];
+    rel_comprado_de [label="Comprado_De"];
+    rel_vendido_para [label="Vendido_Para"];
+    rel_mantem [label="Mantem"];
+    rel_usa_produto [label="Usa"];
+    rel_feita_por [label="Feita_Por"];
+    
+    node [shape=diamond, peripheries=2, fontsize=10];
+    rel_possui_pesagem [label="Possui"];
+    rel_recebe_aplicacao [label="Recebe"];
+
+    // Atributos (Fonte e margens reduzidas)
+    node [shape=ellipse, style="filled", fillcolor="#FFFFFF", peripheries=1, fixedsize=false, fontsize=9, margin="0.1,0.05"];
+    
+    Boi_Brinco [label="Brinco", style="filled, underlined"];
+    Boi_Status [label="Status"];
+    Boi_Valor_Compra [label="Valor_Compra"];
+    Boi_Valor_Venda [label="Valor_Venda"];
+    
+    Pasto_ID [label="ID_Pasto", style="filled, underlined"];
+    Pasto_Nome [label="Nome_Pasto"];
+    Pasto_Tamanho [label="Tamanho"];
+    Pasto_Situacao [label="Situacao_Cerca"];
+    Pasto_Qtd [label="Quantitativo", style="dashed"]; 
+    
+    Func_CPF [label="CPF", style="filled, underlined"];
+    Func_Nome [label="Nome"];
+    Func_Funcao [label="Funcao"];
+    Func_Salario [label="Salario"];
+    
+    Prod_ID [label="ID_Produto", style="filled, underlined"];
+    Prod_Nome [label="Nome"];
+    Prod_Funcao [label="Funcao"];
+    Prod_Preco [label="Preco"];
+    Prod_Qtd [label="Qtd_Estoque"];
+    
+    Lote_ID [label="ID_Lote", style="filled, underlined"];
+    Lote_Descricao [label="Descricao"];
+    
+    Comprador_ID [label="CPF_CNPJ", style="filled, underlined"];
+    Comprador_Nome [label="Nome"];
+    Comprador_Cidade [label="Cidade"];
+    
+    Vendedor_ID [label="CPF_CNPJ", style="filled, underlined"];
+    Vendedor_Nome [label="Nome"];
+    Vendedor_Cidade [label="Cidade"];
+    
+    Pesagem_Data [label="Data_Pesagem", style="dashed, underlined"]; 
+    Pesagem_Peso [label="Peso_Kg"];
+    
+    Aplicacao_Data [label="Data_Aplicacao", style="dashed, underlined"]; 
+
+    // --- 2. CONEXÕES ---
+
+    // Atributos das entidades (Linhas curtas, pontilhadas e com "peso")
+    edge [len=0.1, style=dotted, weight=100];
+    BOI -> Boi_Brinco;
+    BOI -> Boi_Status;
+    BOI -> Boi_Valor_Compra;
+    BOI -> Boi_Valor_Venda;
+    
+    PASTO -> Pasto_ID;
+    PASTO -> Pasto_Nome;
+    PASTO -> Pasto_Tamanho;
+    PASTO -> Pasto_Situacao;
+    PASTO -> Pasto_Qtd;
+    
+    FUNCIONARIO -> Func_CPF;
+    FUNCIONARIO -> Func_Nome;
+    FUNCIONARIO -> Func_Funcao;
+    FUNCIONARIO -> Func_Salario;
+    
+    PRODUTO -> Prod_ID;
+    PRODUTO -> Prod_Nome;
+    PRODUTO -> Prod_Funcao;
+    PRODUTO -> Prod_Preco;
+    PRODUTO -> Prod_Qtd;
+    
+    LOTE -> Lote_ID;
+    LOTE -> Lote_Descricao;
+    
+    COMPRADOR -> Comprador_ID;
+    COMPRADOR -> Comprador_Nome;
+    COMPRADOR -> Comprador_Cidade;
+    
+    VENDEDOR -> Vendedor_ID;
+    VENDEDOR -> Vendedor_Nome;
+    VENDEDOR -> Vendedor_Cidade;
+    
+    PESAGEM -> Pesagem_Data;
+    PESAGEM -> Pesagem_Peso;
+    
+    APLICACAO -> Aplicacao_Data;
+
+    // Relacionamentos entre entidades (Linhas sólidas, peso padrão)
+    edge [len=1.5, style=solid, weight=1];
+    BOI -> rel_esta_em [taillabel=" N"];
+    rel_esta_em -> PASTO [headlabel=" 1"];
+    
+    BOI -> rel_pertence_ao [taillabel=" N"];
+    rel_pertence_ao -> LOTE [headlabel=" 1"];
+    
+    BOI -> rel_comprado_de [taillabel=" N"];
+    rel_comprado_de -> VENDEDOR [headlabel=" 1"];
+    
+    BOI -> rel_vendido_para [taillabel=" N"];
+    rel_vendido_para -> COMPRADOR [headlabel=" 1"];
+
+    FUNCIONARIO -> rel_mantem [taillabel=" N"];
+    rel_mantem -> PASTO [headlabel=" M"];
+    
+    BOI -> rel_possui_pesagem [taillabel=" 1"];
+    rel_possui_pesagem -> PESAGEM [headlabel=" N"];
+    
+    BOI -> rel_recebe_aplicacao [taillabel=" 1"]; 
+    rel_recebe_aplicacao -> APLICACAO [headlabel=" N"]; 
+    
+    APLICACAO -> rel_usa_produto [taillabel=" N"]; 
+    rel_usa_produto -> PRODUTO [headlabel=" 1"];
+    
+    APLICACAO -> rel_feita_por [taillabel=" N"]; 
+    rel_feita_por -> FUNCIONARIO [headlabel=" 1"];
+}
