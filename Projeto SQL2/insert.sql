@@ -3,9 +3,7 @@
 SCRIPT DE POVOAMENTO EM MASSA (MÉTODO TRADICIONAL SEQUENCIAL)
 ================================================================================
 -- Este script irá gerar dados fictícios para todas as 12 tabelas.
--- Versão 4: Solução definitiva para o Erro 1137 (Can't reopen table).
--- Criamos tabelas de geração de números em passos separados e as
--- apagamos no final.
+-- Versão 5: Script corrigido para popular 100+ funcionários.
 */
 
 -- Inicia uma transação. Se algo falhar, tudo é revertido.
@@ -18,7 +16,6 @@ SET FOREIGN_KEY_CHECKS=0;
 ================================================================================
 1. CRIAÇÃO DO GERADOR DE NÚMEROS (PASSO A PASSO)
 ================================================================================
--- Primeiro, limpamos qualquer tentativa anterior.
 */
 DROP TABLE IF EXISTS _N10;
 DROP TABLE IF EXISTS _N100;
@@ -32,15 +29,14 @@ INSERT INTO _N10 VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9);
 CREATE TABLE _N100 (id INT);
 INSERT INTO _N100 (id)
 SELECT (a.n * 10) + b.n AS id
-FROM _N10 a, _N10 b; -- Usando sintaxe de JOIN implícita (mais antiga)
+FROM _N10 a, _N10 b;
 
 -- Passo 3: Criamos 1000 números (0-999) usando _N10 e _N100
 CREATE TABLE _N1000 (id INT);
 INSERT INTO _N1000 (id)
 SELECT (a.n * 100) + b.id AS id
-FROM _N10 a, _N100 b; -- Nenhum erro 1137 aqui
+FROM _N10 a, _N100 b;
 
--- Agora temos _N100 (para 100 registros) e _N1000 (para 300 pessoas)
 
 /*
 ================================================================================
@@ -110,34 +106,52 @@ FROM _N100; -- 100 produtos
 ================================================================================
 */
 
--- FUNCIONARIO (10 registros)
+-- FUNCIONARIO (100 registros)
+-- Insere 100 funcionários, pegando da "fatia" 1-100 da tabela PESSOA.
+-- Os 10 primeiros (id 1-10) são "Gerentes" (sem supervisor).
+-- Os 90 restantes (id 11-100) são "Operacionais", supervisionados por um dos 10 gerentes.
 INSERT INTO FUNCIONARIO (CPF_CNPJ, Funcao, Salario, CPF_Supervisor)
-VALUES
-('111.111.111-11', 'Proprietário', 15000.00, NULL);
+SELECT
+    P.CPF_CNPJ,
+    CASE
+        WHEN P.id <= 10 THEN 'Gerente'
+        ELSE 'Operacional'
+    END AS Funcao,
+    (RAND() * 5000) + 2500 AS Salario,
+    CASE
+        WHEN P.id <= 10 THEN NULL -- Gerentes não têm supervisor
+        ELSE
+            -- Seleciona um CPF aleatório do grupo de Gerentes (id 1-10)
+            (
+                SELECT CPF_CNPJ
+                FROM (
+                    -- Pega os mesmos 10 Gerentes
+                    SELECT CPF_CNPJ, ROW_NUMBER() OVER(ORDER BY CPF_CNPJ) as id
+                    FROM PESSOA
+                ) AS Gerentes
+                WHERE Gerentes.id <= 10
+                ORDER BY RAND()
+                LIMIT 1
+            )
+    END AS CPF_Supervisor
+FROM (
+    -- Pega todas as pessoas e numera
+    SELECT CPF_CNPJ, ROW_NUMBER() OVER(ORDER BY CPF_CNPJ) as id
+    FROM PESSOA
+) AS P
+WHERE P.id BETWEEN 1 AND 100; -- Pega a "fatia" dos Funcionários
 
--- Nível 2: Os Gerentes (supervisionados pelo Proprietário '111.111.111-11')
-INSERT INTO FUNCIONARIO (CPF_CNPJ, Funcao, Salario, CPF_Supervisor)
-VALUES
-('222.222.222-22', 'Gerente de Campo', 7500.00, '111.111.111-11'),
-('333.333.333-33', 'Gerente Administrativo', 7000.00, '111.111.111-11');
-
--- Nível 3: Os Funcionários Operacionais (supervisionados pelos Gerentes)
-INSERT INTO FUNCIONARIO (CPF_CNPJ, Funcao, Salario, CPF_Supervisor)
-VALUES
-('444.444.444-44', 'Vaqueiro', 3500.00, '222.222.222-22'), -- Subordinado da Ger. de Campo
-('555.555.555-55', 'Peão de Campo', 3200.00, '222.222.222-22'), -- Subordinado da Ger. de Campo
-('666.666.666-66', 'Auxiliar Administrativo', 2800.00, '333.333.333-33'); -- Subordinada do Ger. Admin
 
 -- COMPRADOR (100 registros)
 INSERT INTO COMPRADOR (CPF_CNPJ)
 SELECT CPF_CNPJ
-FROM (SELECT *, ROW_NUMBER() OVER(ORDER BY CPF_CNPJ) as id FROM PESSOA) AS P
+FROM (SELECT CPF_CNPJ, ROW_NUMBER() OVER(ORDER BY CPF_CNPJ) as id FROM PESSOA) AS P
 WHERE P.id BETWEEN 101 AND 200;
 
 -- VENDEDOR (100 registros)
 INSERT INTO VENDEDOR (CPF_CNPJ)
 SELECT CPF_CNPJ
-FROM (SELECT *, ROW_NUMBER() OVER(ORDER BY CPF_CNPJ) as id FROM PESSOA) AS P
+FROM (SELECT CPF_CNPJ, ROW_NUMBER() OVER(ORDER BY CPF_CNPJ) as id FROM PESSOA) AS P
 WHERE P.id BETWEEN 201 AND 300;
 
 
@@ -270,4 +284,4 @@ SET FOREIGN_KEY_CHECKS=1;
 -- Confirma a transação
 COMMIT;
 
-SELECT 'Banco de dados povoado com sucesso com 100+ registros por tabela!' AS Status;
+SELECT 'Banco de dados povoado com sucesso com 100+ registros por tabela!' AS Status;a
