@@ -110,14 +110,23 @@ FROM _N100; -- 100 produtos
 ================================================================================
 */
 
--- FUNCIONARIO (100 registros)
-INSERT INTO FUNCIONARIO (CPF_CNPJ, Funcao, Salario)
-SELECT 
-    CPF_CNPJ,
-    CONCAT('Função ', (id % 5)),
-    (RAND() * 5000) + 2000 -- Salário entre 2000 e 7000
-FROM (SELECT *, ROW_NUMBER() OVER(ORDER BY CPF_CNPJ) as id FROM PESSOA) AS P
-WHERE P.id BETWEEN 1 AND 100;
+-- FUNCIONARIO (10 registros)
+INSERT INTO FUNCIONARIO (CPF_CNPJ, Funcao, Salario, CPF_Supervisor)
+VALUES
+('111.111.111-11', 'Proprietário', 15000.00, NULL);
+
+-- Nível 2: Os Gerentes (supervisionados pelo Proprietário '111.111.111-11')
+INSERT INTO FUNCIONARIO (CPF_CNPJ, Funcao, Salario, CPF_Supervisor)
+VALUES
+('222.222.222-22', 'Gerente de Campo', 7500.00, '111.111.111-11'),
+('333.333.333-33', 'Gerente Administrativo', 7000.00, '111.111.111-11');
+
+-- Nível 3: Os Funcionários Operacionais (supervisionados pelos Gerentes)
+INSERT INTO FUNCIONARIO (CPF_CNPJ, Funcao, Salario, CPF_Supervisor)
+VALUES
+('444.444.444-44', 'Vaqueiro', 3500.00, '222.222.222-22'), -- Subordinado da Ger. de Campo
+('555.555.555-55', 'Peão de Campo', 3200.00, '222.222.222-22'), -- Subordinado da Ger. de Campo
+('666.666.666-66', 'Auxiliar Administrativo', 2800.00, '333.333.333-33'); -- Subordinada do Ger. Admin
 
 -- COMPRADOR (100 registros)
 INSERT INTO COMPRADOR (CPF_CNPJ)
