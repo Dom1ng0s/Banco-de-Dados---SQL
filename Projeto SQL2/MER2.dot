@@ -1,0 +1,228 @@
+digraph MER_Fazenda_Completo {
+
+    // --- Configurações Gerais (Mantidas) ---
+    graph [
+        label="MER - Fazenda São José (Modelo Completo)", 
+        labelloc=t, 
+        fontsize=24, 
+        rankdir=LR,
+        nodesep=0.6,
+        ranksep=1.2,
+        overlap=false 
+    ];
+    
+    // --- Estilos Padrão (Mantidos) ---
+    node [ fontname="Arial" ];
+    edge [ fontname="Arial", fontsize=10, dir=none ]; 
+
+    // --- 1. DEFINIÇÃO DOS NÓS ---
+
+    // Entidades principais (Forte / Superclasse)
+    node [shape=box, style="filled", fillcolor="#E0E0E0", peripheries=1, fontsize=12];
+    PESSOA; // <- NOVA (Superclasse)
+    BOI; PASTO; PRODUTO; LOTE;
+    
+    // Entidades Subclasse (Herança)
+    node [shape=box, style="filled", fillcolor="#D0D0D0", peripheries=1, fontsize=12]; // Cor ligeiramente diferente
+    FUNCIONARIO; COMPRADOR; VENDEDOR;
+    
+    // Entidades Associativas / Fracas (peripheries=2)
+    node [shape=box, peripheries=2, style="filled", fillcolor="#E0E0E0", fontsize=12];
+    PESAGEM; 
+    APLICACAO_VACINA; // <- RENOMEADA
+    MANUTENCAO; // <- NOVA (Agregação)
+    ITEM_MANUTENCAO; // <- NOVA (Agregação)
+    
+    // Relacionamentos (Losango Padrão)
+    node [shape=diamond, style="filled", fillcolor="#B0C4DE", peripheries=1, fontsize=10];
+    rel_esta_em [label="Esta_Em"];
+    rel_pertence_ao [label="Pertence_Ao"];
+    rel_comprado_de [label="Comprado_De"];
+    rel_vendido_para [label="Vendido_Para"];
+    rel_usa_produto [label="Usa"];
+    rel_feita_por [label="Feita_Por"];
+    rel_supervisiona [label="Supervisiona"]; // <- NOVA (Auto-Relacionamento)
+    rel_realiza [label="Realiza"]; // <- NOVA (Agregação)
+    rel_recebe [label="Recebe"]; // <- NOVA (Agregação)
+    
+    // Relacionamentos Identificadores (Losango Duplo)
+    node [shape=diamond, peripheries=2, style="filled", fillcolor="#B0C4DE", fontsize=10];
+    rel_possui_pesagem [label="Possui"];
+    rel_recebe_vacina [label="Recebe"]; // <- RENOMEADO
+    rel_tem_itens [label="Tem_Itens"]; // <- NOVA (Agregação)
+    rel_e_usado_em [label="E_Usado_Em"]; // <- NOVA (Agregação)
+
+    // Nó de Herança (Triângulo)
+    node [shape=triangle, style="filled", fillcolor="#FFFFE0", peripheries=1, label="É_UM (d)", fontsize=10];
+    rel_heranca_pessoa; // <- NOVA
+    
+    // --- Atributos ---
+    node [shape=ellipse, style="filled", fillcolor="#FFFFFF", peripheries=1, fixedsize=false, fontsize=9, margin="0.1,0.05"];
+    
+    // Atributos de PESSOA (NOVO)
+    Pessoa_ID [label="CPF_CNPJ", style="filled, underlined"];
+    Pessoa_Nome [label="Nome"];
+    Pessoa_Cidade [label="Cidade"];
+    
+    // Atributos de FUNCIONARIO (ATUALIZADO)
+    Func_ID [label="CPF_CNPJ (PK, FK)", style="filled, underlined"]; // Chave herdada
+    Func_Funcao [label="Funcao"];
+    Func_Salario [label="Salario"];
+    Func_Supervisor [label="CPF_Supervisor (FK)"]; // Atributo do auto-relacionamento
+    
+    // Atributos de COMPRADOR (ATUALIZADO)
+    Comprador_ID [label="CPF_CNPJ (PK, FK)", style="filled, underlined"]; // Chave herdada
+    
+    // Atributos de VENDEDOR (ATUALIZADO)
+    Vendedor_ID [label="CPF_CNPJ (PK, FK)", style="filled, underlined"]; // Chave herdada
+    
+    // Atributos de BOI (Mantido)
+    Boi_Brinco [label="Brinco", style="filled, underlined"];
+    Boi_Status [label="Status"];
+    Boi_Valor_Compra [label="Valor_Compra"];
+    Boi_Valor_Venda [label="Valor_Venda"];
+    
+    // Atributos de PASTO (Mantido)
+    Pasto_ID [label="ID_Pasto", style="filled, underlined"];
+    Pasto_Nome [label="Nome_Pasto"];
+    Pasto_Tamanho [label="Tamanho"];
+    Pasto_Situacao [label="Situacao_Cerca"];
+    Pasto_Qtd [label="Quantitativo", style="dashed"]; 
+    
+    // Atributos de PRODUTO (Mantido)
+    Prod_ID [label="ID_Produto", style="filled, underlined"];
+    Prod_Nome [label="Nome"];
+    Prod_Funcao [label="Funcao"];
+    Prod_Preco [label="Preco"];
+    Prod_Qtd [label="Qtd_Estoque"];
+    
+    // Atributos de LOTE (ATUALIZADO)
+    Lote_ID [label="ID_Lote", style="filled, underlined"];
+    Lote_Descricao [label="Descricao"];
+    Lote_Data_Criacao [label="Data_Criacao"]; // <- NOVO
+    
+    // Atributos de PESAGEM (Mantido)
+    Pesagem_Data [label="Data_Pesagem", style="dashed, underlined"]; 
+    Pesagem_Peso [label="Peso_Kg"];
+    
+    // Atributos de APLICACAO_VACINA (RENOMEADO)
+    Vacina_Data [label="Data_Aplicacao", style="dashed, underlined"]; 
+    
+    // Atributos de MANUTENCAO (NOVO)
+    Manut_ID [label="ID_Manutencao", style="filled, underlined"];
+    Manut_Data [label="Data_Manutencao"];
+    Manut_Descricao [label="Descricao_Servico"];
+
+    // Atributos de ITEM_MANUTENCAO (NOVO)
+    Item_Manut_Qtd [label="Quantidade_Usada"];
+
+    // --- 2. CONEXÕES ---
+
+    // Atributos das entidades (Linhas curtas, pontilhadas)
+    edge [len=0.1, style=dotted, weight=100];
+    
+    PESSOA -> Pessoa_ID;
+    PESSOA -> Pessoa_Nome;
+    PESSOA -> Pessoa_Cidade;
+    
+    FUNCIONARIO -> Func_ID;
+    FUNCIONARIO -> Func_Funcao;
+    FUNCIONARIO -> Func_Salario;
+    FUNCIONARIO -> Func_Supervisor; // <- NOVO
+
+    COMPRADOR -> Comprador_ID;
+    
+    VENDEDOR -> Vendedor_ID;
+    
+    BOI -> Boi_Brinco;
+    BOI -> Boi_Status;
+    BOI -> Boi_Valor_Compra;
+    BOI -> Boi_Valor_Venda;
+    
+    PASTO -> Pasto_ID;
+    PASTO -> Pasto_Nome;
+    PASTO -> Pasto_Tamanho;
+    PASTO -> Pasto_Situacao;
+    PASTO -> Pasto_Qtd;
+    
+    PRODUTO -> Prod_ID;
+    PRODUTO -> Prod_Nome;
+    PRODUTO -> Prod_Funcao;
+    PRODUTO -> Prod_Preco;
+    PRODUTO -> Prod_Qtd;
+    
+    LOTE -> Lote_ID;
+    LOTE -> Lote_Descricao;
+    LOTE -> Lote_Data_Criacao; // <- NOVO
+    
+    PESAGEM -> Pesagem_Data;
+    PESAGEM -> Pesagem_Peso;
+    
+    APLICACAO_VACINA -> Vacina_Data; // <- RENOMEADO
+
+    MANUTENCAO -> Manut_ID; // <- NOVO
+    MANUTENCAO -> Manut_Data; // <- NOVO
+    MANUTENCAO -> Manut_Descricao; // <- NOVO
+
+    ITEM_MANUTENCAO -> Item_Manut_Qtd; // <- NOVO
+
+    // Relacionamentos entre entidades (Linhas sólidas)
+    edge [len=1.5, style=solid, weight=1];
+    
+    // Herança (NOVO)
+    PESSOA -> rel_heranca_pessoa [len=0.5];
+    rel_heranca_pessoa -> FUNCIONARIO [len=0.5];
+    rel_heranca_pessoa -> COMPRADOR [len=0.5];
+    rel_heranca_pessoa -> VENDEDOR [len=0.5];
+
+    // Auto-Relacionamento (NOVO)
+    FUNCIONARIO -> rel_supervisiona [taillabel=" 1 (supervisiona)"];
+    rel_supervisiona -> FUNCIONARIO [headlabel=" N (é supervisionado)"];
+    
+    // Relações de BOI (Cardinalidade de Venda ATUALIZADA)
+    BOI -> rel_esta_em [taillabel=" N"];
+    rel_esta_em -> PASTO [headlabel=" 1"];
+    
+    BOI -> rel_pertence_ao [taillabel=" N"];
+    rel_pertence_ao -> LOTE [headlabel=" 1"];
+    
+    BOI -> rel_comprado_de [taillabel=" N"];
+    rel_comprado_de -> VENDEDOR [headlabel=" 1"];
+    
+    BOI -> rel_vendido_para [taillabel=" N"];
+    rel_vendido_para -> COMPRADOR [headlabel=" (0,1)"]; // <- Opcional
+    
+    // Relações de Entidades Fracas (RENOMEADO)
+    BOI -> rel_possui_pesagem [taillabel=" 1"];
+    rel_possui_pesagem -> PESAGEM [headlabel=" N"];
+    
+    BOI -> rel_recebe_vacina [taillabel=" 1"]; 
+    rel_recebe_vacina -> APLICACAO_VACINA [headlabel=" N"]; 
+    
+    APLICACAO_VACINA -> rel_usa_produto [taillabel=" N"]; 
+    rel_usa_produto -> PRODUTO [headlabel=" 1"];
+    
+    APLICACAO_VACINA -> rel_feita_por [taillabel=" N"]; 
+    rel_feita_por -> FUNCIONARIO [headlabel=" 1"];
+
+    // Relações da Agregação (NOVAS)
+    // 1. Manutenção é o evento (N:M reificado)
+    FUNCIONARIO -> rel_realiza [taillabel=" 1"];
+    rel_realiza -> MANUTENCAO [headlabel=" N"];
+    
+    PASTO -> rel_recebe [taillabel=" 1"];
+    rel_recebe -> MANUTENCAO [headlabel=" N"];
+    
+    // 2. Itens da Manutenção (N:M entre Manutenção e Produto)
+    MANUTENCAO -> rel_tem_itens [taillabel=" 1"];
+    rel_tem_itens -> ITEM_MANUTENCAO [headlabel=" N"];
+    
+    PRODUTO -> rel_e_usado_em [taillabel=" 1"];
+    rel_e_usado_em -> ITEM_MANUTENCAO [headlabel=" N"];
+    
+    // --- Ordenação (opcional, para ajudar o layout LR) ---
+    { rank=same; VENDEDOR; COMPRADOR; FUNCIONARIO; PESSOA }
+    { rank=same; PRODUTO; PASTO; LOTE }
+    { rank=same; MANUTENCAO; BOI }
+    { rank=same; ITEM_MANUTENCAO; APLICACAO_VACINA; PESAGEM }
+}
